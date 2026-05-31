@@ -1,0 +1,22 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+.venv/
+__pycache__/
+*.pyc
+features/
+*.npz
+umap_cache/
+.venv/
+__pycache__/
+*.pyc
+features/
+*.npz
+umap_cache/

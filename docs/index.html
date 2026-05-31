@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>pretrained features · UMAP explorer</title>
+<style>
+  :root{
+    --ink:#0d1014; --panel:#12161c; --paper:#f4f1ea; --muted:#8b94a3;
+    --line:#262d38; --accent:#d98c3f; --accent2:#5fb3b3;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; background:var(--ink); color:var(--paper);
+    font-family:ui-monospace,"SF Mono",Menlo,"Cascadia Mono",monospace;
+    background-image:radial-gradient(rgba(255,255,255,.035) 1px,transparent 1px);
+    background-size:22px 22px;
+    display:flex; flex-direction:column;
+  }
+  header{
+    padding:26px 30px 18px; border-bottom:1px solid var(--line);
+    display:flex; flex-wrap:wrap; align-items:flex-end; gap:8px 28px;
+  }
+  .brand{display:flex; flex-direction:column; gap:4px; margin-right:auto}
+  h1{
+    margin:0; font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    font-weight:600; font-size:clamp(22px,3vw,34px); letter-spacing:.2px;
+    color:var(--paper);
+  }
+  h1 .em{color:var(--accent); font-style:italic}
+  .sub{color:var(--muted); font-size:12px; letter-spacing:.14em; text-transform:uppercase}
+  .controls{display:flex; flex-wrap:wrap; gap:18px}
+  .field{display:flex; flex-direction:column; gap:6px}
+  .field label{font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted)}
+  select{
+    appearance:none; background:var(--panel); color:var(--paper);
+    border:1px solid var(--line); border-radius:7px; padding:9px 34px 9px 12px;
+    font:inherit; font-size:13px; cursor:pointer; min-width:190px;
+    background-image:linear-gradient(45deg,transparent 50%,var(--accent) 50%),
+                     linear-gradient(135deg,var(--accent) 50%,transparent 50%);
+    background-position:calc(100% - 17px) center,calc(100% - 12px) center;
+    background-size:5px 5px,5px 5px; background-repeat:no-repeat;
+    transition:border-color .15s;
+  }
+  select:hover{border-color:var(--accent)}
+  select:focus{outline:none; border-color:var(--accent2)}
+  .stage{flex:1; position:relative; padding:18px 22px 22px}
+  .frame{
+    position:absolute; inset:18px 22px 22px; border:1px solid var(--line);
+    border-radius:10px; overflow:hidden; background:#fbfbfd;
+    box-shadow:0 10px 40px rgba(0,0,0,.45);
+  }
+  /* corner ticks – instrument-panel detail */
+  .frame::before,.frame::after{
+    content:""; position:absolute; width:14px; height:14px; pointer-events:none;
+    border-color:var(--accent); border-style:solid; z-index:3;
+  }
+  .frame::before{top:-1px;left:-1px;border-width:1px 0 0 1px}
+  .frame::after{bottom:-1px;right:-1px;border-width:0 1px 1px 0}
+  iframe{width:100%; height:100%; border:0; display:block; background:#fbfbfd}
+  #msg{
+    position:absolute; inset:0; display:none; place-items:center; text-align:center;
+    color:#56607a; font-size:14px; padding:30px;
+  }
+  footer{padding:10px 30px 16px; color:var(--muted); font-size:11px; border-top:1px solid var(--line)}
+  footer b{color:var(--accent2)}
+  a{color:var(--accent2); text-decoration:none}
+</style>
+</head><body>
+<header>
+  <div class="brand">
+    <h1>Embedding <span class="em">Atlas</span></h1>
+    <div class="sub">pretrained features · UMAP explorer</div>
+  </div>
+  <div class="controls">
+    <div class="field">
+      <label for="model">Pretrained model</label>
+      <select id="model"><option value="clip_vit_b32">clip_vit_b32</option><option value="dinov2_b">dinov2_b</option><option value="efficientnet_b4">efficientnet_b4</option><option value="resnet101">resnet101</option><option value="resnet50">resnet50</option><option value="swin_b">swin_b</option><option value="vit_b16">vit_b16</option></select>
+    </div>
+    <div class="field">
+      <label for="dataset">Test dataset</label>
+      <select id="dataset"><option value="beans">beans</option><option value="chest_xray">chest_xray</option><option value="cifar10">cifar10</option><option value="cifar100">cifar100</option><option value="eurosat">eurosat</option><option value="fashion_mnist">fashion_mnist</option><option value="flowers102">flowers102</option><option value="food101">food101</option><option value="mini_imagenet">mini_imagenet</option><option value="oxford_pets">oxford_pets</option><option value="pathmnist">pathmnist</option><option value="skin_cancer">skin_cancer</option></select>
+    </div>
+  </div>
+</header>
+
+<div class="stage">
+  <div class="frame">
+    <iframe id="view" title="UMAP plot"></iframe>
+    <div id="msg"></div>
+  </div>
+</div>
+
+<footer>
+  UMAP of pretrained image-classifier features &middot;
+  <b>hover</b> a point for its image &middot; <b>scroll</b> to zoom &middot;
+  <b>drag</b> to pan &middot; click a legend entry to hide a class.
+</footer>
+
+<script>
+  // The ONLY hand-written JS: swap the iframe when a dropdown changes.
+  const COMBOS = new Set(["clip_vit_b32__beans", "clip_vit_b32__chest_xray", "clip_vit_b32__cifar10", "clip_vit_b32__cifar100", "clip_vit_b32__eurosat", "clip_vit_b32__fashion_mnist", "clip_vit_b32__flowers102", "clip_vit_b32__food101", "clip_vit_b32__mini_imagenet", "clip_vit_b32__oxford_pets", "clip_vit_b32__pathmnist", "clip_vit_b32__skin_cancer", "dinov2_b__beans", "dinov2_b__chest_xray", "dinov2_b__cifar10", "dinov2_b__cifar100", "dinov2_b__eurosat", "dinov2_b__fashion_mnist", "dinov2_b__flowers102", "dinov2_b__food101", "dinov2_b__mini_imagenet", "dinov2_b__oxford_pets", "dinov2_b__pathmnist", "dinov2_b__skin_cancer", "efficientnet_b4__beans", "efficientnet_b4__chest_xray", "efficientnet_b4__cifar10", "efficientnet_b4__cifar100", "efficientnet_b4__eurosat", "efficientnet_b4__fashion_mnist", "efficientnet_b4__flowers102", "efficientnet_b4__food101", "efficientnet_b4__mini_imagenet", "efficientnet_b4__oxford_pets", "efficientnet_b4__pathmnist", "efficientnet_b4__skin_cancer", "resnet101__beans", "resnet101__chest_xray", "resnet101__cifar10", "resnet101__cifar100", "resnet101__eurosat", "resnet101__fashion_mnist", "resnet101__flowers102", "resnet101__food101", "resnet101__mini_imagenet", "resnet101__oxford_pets", "resnet101__pathmnist", "resnet101__skin_cancer", "resnet50__beans", "resnet50__chest_xray", "resnet50__cifar10", "resnet50__cifar100", "resnet50__eurosat", "resnet50__fashion_mnist", "resnet50__flowers102", "resnet50__food101", "resnet50__mini_imagenet", "resnet50__oxford_pets", "resnet50__pathmnist", "resnet50__skin_cancer", "swin_b__beans", "swin_b__chest_xray", "swin_b__cifar10", "swin_b__cifar100", "swin_b__eurosat", "swin_b__fashion_mnist", "swin_b__flowers102", "swin_b__food101", "swin_b__mini_imagenet", "swin_b__oxford_pets", "swin_b__pathmnist", "swin_b__skin_cancer", "vit_b16__beans", "vit_b16__chest_xray", "vit_b16__cifar10", "vit_b16__cifar100", "vit_b16__eurosat", "vit_b16__fashion_mnist", "vit_b16__flowers102", "vit_b16__food101", "vit_b16__mini_imagenet", "vit_b16__oxford_pets", "vit_b16__pathmnist", "vit_b16__skin_cancer"]);          // "model__dataset" pairs that exist
+  const m = document.getElementById('model');
+  const d = document.getElementById('dataset');
+  const f = document.getElementById('view');
+  const msg = document.getElementById('msg');
+  function update(){
+    const key = m.value + '__' + d.value;
+    if (COMBOS.has(key)){
+      f.style.display = '';  msg.style.display = 'none';
+      f.src = key + '.html';
+    } else {
+      f.style.display = 'none';
+      msg.style.display = 'grid';
+      msg.textContent = 'No precomputed plot for ' + m.value + ' \u00d7 ' + d.value + '.';
+    }
+  }
+  m.addEventListener('change', update);
+  d.addEventListener('change', update);
+  update();
+</script>
+</body></html>
