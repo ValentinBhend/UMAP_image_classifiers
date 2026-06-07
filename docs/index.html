@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>pretrained classifier feature vectors · UMAP explorer</title>
+<title>pretrained features · UMAP explorer</title>
 <style>
   :root{
     --ink:#0d1014; --panel:#12161c; --paper:#f4f1ea; --muted:#8b94a3;
@@ -64,12 +64,12 @@
 <header>
   <div class="brand">
     <h1>UMAP image embeddings</h1>
-    <div class="sub">pretrained classifier feature vectors · UMAP explorer</div>
+    <div class="sub">pretrained features · UMAP explorer</div>
   </div>
   <div class="controls">
     <div class="field">
       <label for="model">Pretrained model</label>
-      <select id="model"><option value="clip_vit_b32">clip_vit_b32</option><option value="dinov2_b">dinov2_b</option><option value="efficientnet_b4">efficientnet_b4</option><option value="resnet101">resnet101</option><option value="resnet50">resnet50</option><option value="swin_b">swin_b</option><option value="vit_b16">vit_b16</option></select>
+      <select id="model"><option value="clip_vit_b32">clip_vit_b32</option><option value="dinov2_b">dinov2_b</option><option value="efficientnet_b4">efficientnet_b4</option><option value="raw_032px">raw_032px</option><option value="raw_128px">raw_128px</option><option value="resnet101">resnet101</option><option value="resnet50">resnet50</option><option value="swin_b">swin_b</option><option value="vit_b16">vit_b16</option></select>
     </div>
     <div class="field">
       <label for="dataset">Test dataset</label>
@@ -94,7 +94,7 @@
 
 <script>
   // The ONLY hand-written JS: swap the iframe when a dropdown changes.
-  const COMBOS = new Set(["clip_vit_b32__beans", "clip_vit_b32__chest_xray", "clip_vit_b32__cifar10", "clip_vit_b32__cifar100", "clip_vit_b32__eurosat", "clip_vit_b32__fashion_mnist", "clip_vit_b32__flowers102", "clip_vit_b32__food101", "clip_vit_b32__mini_imagenet", "clip_vit_b32__oxford_pets", "clip_vit_b32__pathmnist", "clip_vit_b32__skin_cancer", "dinov2_b__beans", "dinov2_b__chest_xray", "dinov2_b__cifar10", "dinov2_b__cifar100", "dinov2_b__eurosat", "dinov2_b__fashion_mnist", "dinov2_b__flowers102", "dinov2_b__food101", "dinov2_b__mini_imagenet", "dinov2_b__oxford_pets", "dinov2_b__pathmnist", "dinov2_b__skin_cancer", "efficientnet_b4__beans", "efficientnet_b4__chest_xray", "efficientnet_b4__cifar10", "efficientnet_b4__cifar100", "efficientnet_b4__eurosat", "efficientnet_b4__fashion_mnist", "efficientnet_b4__flowers102", "efficientnet_b4__food101", "efficientnet_b4__mini_imagenet", "efficientnet_b4__oxford_pets", "efficientnet_b4__pathmnist", "efficientnet_b4__skin_cancer", "resnet101__beans", "resnet101__chest_xray", "resnet101__cifar10", "resnet101__cifar100", "resnet101__eurosat", "resnet101__fashion_mnist", "resnet101__flowers102", "resnet101__food101", "resnet101__mini_imagenet", "resnet101__oxford_pets", "resnet101__pathmnist", "resnet101__skin_cancer", "resnet50__beans", "resnet50__chest_xray", "resnet50__cifar10", "resnet50__cifar100", "resnet50__eurosat", "resnet50__fashion_mnist", "resnet50__flowers102", "resnet50__food101", "resnet50__mini_imagenet", "resnet50__oxford_pets", "resnet50__pathmnist", "resnet50__skin_cancer", "swin_b__beans", "swin_b__chest_xray", "swin_b__cifar10", "swin_b__cifar100", "swin_b__eurosat", "swin_b__fashion_mnist", "swin_b__flowers102", "swin_b__food101", "swin_b__mini_imagenet", "swin_b__oxford_pets", "swin_b__pathmnist", "swin_b__skin_cancer", "vit_b16__beans", "vit_b16__chest_xray", "vit_b16__cifar10", "vit_b16__cifar100", "vit_b16__eurosat", "vit_b16__fashion_mnist", "vit_b16__flowers102", "vit_b16__food101", "vit_b16__mini_imagenet", "vit_b16__oxford_pets", "vit_b16__pathmnist", "vit_b16__skin_cancer"]);
+  const COMBOS = new Set(["clip_vit_b32__beans", "clip_vit_b32__chest_xray", "clip_vit_b32__cifar10", "clip_vit_b32__cifar100", "clip_vit_b32__eurosat", "clip_vit_b32__fashion_mnist", "clip_vit_b32__flowers102", "clip_vit_b32__food101", "clip_vit_b32__mini_imagenet", "clip_vit_b32__oxford_pets", "clip_vit_b32__pathmnist", "clip_vit_b32__skin_cancer", "dinov2_b__beans", "dinov2_b__chest_xray", "dinov2_b__cifar10", "dinov2_b__cifar100", "dinov2_b__eurosat", "dinov2_b__fashion_mnist", "dinov2_b__flowers102", "dinov2_b__food101", "dinov2_b__mini_imagenet", "dinov2_b__oxford_pets", "dinov2_b__pathmnist", "dinov2_b__skin_cancer", "efficientnet_b4__beans", "efficientnet_b4__chest_xray", "efficientnet_b4__cifar10", "efficientnet_b4__cifar100", "efficientnet_b4__eurosat", "efficientnet_b4__fashion_mnist", "efficientnet_b4__flowers102", "efficientnet_b4__food101", "efficientnet_b4__mini_imagenet", "efficientnet_b4__oxford_pets", "efficientnet_b4__pathmnist", "efficientnet_b4__skin_cancer", "resnet101__beans", "resnet101__chest_xray", "resnet101__cifar10", "resnet101__cifar100", "resnet101__eurosat", "resnet101__fashion_mnist", "resnet101__flowers102", "resnet101__food101", "resnet101__mini_imagenet", "resnet101__oxford_pets", "resnet101__pathmnist", "resnet101__skin_cancer", "resnet50__beans", "resnet50__chest_xray", "resnet50__cifar10", "resnet50__cifar100", "resnet50__eurosat", "resnet50__fashion_mnist", "resnet50__flowers102", "resnet50__food101", "resnet50__mini_imagenet", "resnet50__oxford_pets", "resnet50__pathmnist", "resnet50__skin_cancer", "swin_b__beans", "swin_b__chest_xray", "swin_b__cifar10", "swin_b__cifar100", "swin_b__eurosat", "swin_b__fashion_mnist", "swin_b__flowers102", "swin_b__food101", "swin_b__mini_imagenet", "swin_b__oxford_pets", "swin_b__pathmnist", "swin_b__skin_cancer", "vit_b16__beans", "vit_b16__chest_xray", "vit_b16__cifar10", "vit_b16__cifar100", "vit_b16__eurosat", "vit_b16__fashion_mnist", "vit_b16__flowers102", "vit_b16__food101", "vit_b16__mini_imagenet", "vit_b16__oxford_pets", "vit_b16__pathmnist", "vit_b16__skin_cancer", "raw_032px__beans", "raw_128px__beans", "raw_032px__chest_xray", "raw_128px__chest_xray", "raw_032px__cifar10", "raw_128px__cifar10", "raw_032px__cifar100", "raw_128px__cifar100", "raw_032px__eurosat", "raw_128px__eurosat", "raw_032px__fashion_mnist", "raw_128px__fashion_mnist", "raw_032px__flowers102", "raw_128px__flowers102", "raw_032px__food101", "raw_128px__food101", "raw_032px__mini_imagenet", "raw_128px__mini_imagenet", "raw_032px__oxford_pets", "raw_128px__oxford_pets", "raw_032px__pathmnist", "raw_128px__pathmnist", "raw_032px__skin_cancer", "raw_128px__skin_cancer"]);
   const m = document.getElementById('model');
   const d = document.getElementById('dataset');
   const f = document.getElementById('view');
